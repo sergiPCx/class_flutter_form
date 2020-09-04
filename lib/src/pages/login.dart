@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hola_mundo/src/bloc/login_bloc.dart';
+import 'package:hola_mundo/src/bloc/provider.dart';
 
 class LoginPage extends StatelessWidget{
   @override
@@ -15,6 +17,7 @@ class LoginPage extends StatelessWidget{
 
   Widget _login(BuildContext context) {
 
+    final bloc = Provider.of(context);
     final size = MediaQuery.of(context).size;
 
     return SingleChildScrollView(
@@ -42,9 +45,9 @@ class LoginPage extends StatelessWidget{
                 children: <Widget>[
                   Text('Login', style: TextStyle(fontSize: 20),),
                   SizedBox(height: 30,),
-                  _createUser(),
+                  _createUser(bloc),
                   SizedBox(height: 30,),
-                  _createPassword(),
+                  _createPassword(bloc),
                   SizedBox(height: 30,),
                   _createButton(context)
                 ],
@@ -55,33 +58,46 @@ class LoginPage extends StatelessWidget{
     );
   }
 
-  Widget _createUser() {
+  Widget _createUser(LoginBloc bloc) {
 
-        return Container(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: TextField(
-              decoration: InputDecoration(
-                labelText: 'Usuarios',
-                hintText: 'Ingrese su usuario',
-                icon: Icon(
-                    Icons.person, color: Color(0xff4D3CA5)),
-              ),
-            )
-        );
-
+    return StreamBuilder(
+        stream: bloc.emailStream,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          return Container(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: TextField(
+                decoration: InputDecoration(
+                  labelText: 'Usuario',
+                  hintText: 'Ingrese su usuario',
+                  errorText: snapshot.error,
+                  icon: Icon(
+                      Icons.supervised_user_circle, color: Color(0xff4D3CA5)),
+                ),
+                onChanged: (value) => bloc.emailChange(value),
+              )
+          );
+        }
+    );
   }
 
-  _createPassword() {
+  _createPassword(LoginBloc bloc) {
 
-    return Container(
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        child: TextField(
-          obscureText: true,
-          decoration: InputDecoration(
-            labelText: 'Contraseña',
-            icon: Icon( Icons.lock, color: Color(0xff4D3CA5)),
-          ),
-        )
+    return StreamBuilder(
+        stream: bloc.passwordStream,
+        builder: (BuildContext context, AsyncSnapshot snapshot){
+          return Container(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: TextField(
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Contraseña',
+                  errorText: snapshot.error,
+                  icon: Icon( Icons.lock, color: Color(0xff4D3CA5)),
+                ),
+                onChanged: (value) => bloc.passwordChange(value),
+              )
+          );
+        }
     );
   }
 
@@ -94,7 +110,7 @@ class LoginPage extends StatelessWidget{
         textColor: Colors.white,
         color: Color(0xff4D3CA5),
         onPressed: (){
-//        Navigator.pushReplacementNamed(context, 'home');
+          Navigator.pushNamed(context, 'home');
         }
     );
   }

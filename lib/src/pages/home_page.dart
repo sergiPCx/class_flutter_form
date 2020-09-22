@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hola_mundo/src/model/person_model.dart';
+import 'package:hola_mundo/src/service/user_service.dart';
 
 class HomePage extends StatefulWidget{
   @override
@@ -7,6 +9,8 @@ class HomePage extends StatefulWidget{
 
 class _HomePageState extends State<HomePage>{
 
+  UserService userProvider = new UserService();
+  Person person;
   int saldo = 0;
   String name = 'usuario';
 
@@ -29,28 +33,7 @@ class _HomePageState extends State<HomePage>{
         ),
         body: Padding(
           padding: EdgeInsets.fromLTRB(30.0, 40.0, 30.0, 0.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: CircleAvatar(
-                  backgroundImage: AssetImage('assets/images/spiderman.png'),
-                  radius: 40.0,
-                ),
-              ),
-              Divider(
-                height: 90.0,
-                color: Colors.blue[800],
-              ),
-              labelText('Nombre', Colors.grey, 14.0, FontWeight.normal),
-              SizedBox(height: 10.0,),
-              labelText(name, Colors.amberAccent[200], 28.0, FontWeight.bold),
-              SizedBox(height: 20.0,),
-              labelText('Saldo en Cuenta', Colors.grey, 14.0, FontWeight.normal),
-              SizedBox(height: 10.0,),
-              labelText('$saldo', Colors.amberAccent[200], 28.0, FontWeight.bold),
-            ],
-          ),
+          child: _createForm(),
         )
     );
   }
@@ -65,6 +48,41 @@ class _HomePageState extends State<HomePage>{
           fontWeight: fontWeight
       ),
     );
+  }
+
+  Widget _createForm() {
+
+    return FutureBuilder(
+        future: userProvider.getUser(),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          person = snapshot.data;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: CircleAvatar(
+                  backgroundImage: NetworkImage(person.data.avatar),
+//                backgroundImage: AssetImage('assets/images/spiderman.png'),
+                  radius: 40.0,
+                ),
+              ),
+              Divider(
+                height: 90.0,
+                color: Colors.blue[800],
+              ),
+              labelText('Nombre', Colors.grey, 14.0, FontWeight.normal),
+              SizedBox(height: 10.0,),
+              labelText(person.data.email, Colors.amberAccent[200], 28.0, FontWeight.bold),
+              SizedBox(height: 20.0,),
+              labelText('Saldo en Cuenta', Colors.grey, 14.0, FontWeight.normal),
+              SizedBox(height: 10.0,),
+              labelText('$saldo', Colors.amberAccent[200], 28.0, FontWeight.bold),
+            ],
+          );
+        }
+    );
+
+
   }
 
 }
